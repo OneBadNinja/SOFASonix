@@ -584,7 +584,7 @@ class SOFASonix:
         for i in params:
             pi = params[i]
             value = "{} Array".format(pi.value.shape) if \
-                pi.isType("double") else pi.value
+                (pi.isType("double") or pi.isType("string")) else pi.value
             rows.append([".{}".format(i.replace(":", "_").replace(".", "_")),
                          pi.type[0].upper(),
                          value,
