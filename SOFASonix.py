@@ -91,6 +91,29 @@ class SOFASonix:
             db.close()
         return data
 
+    def _updateStrings(self):
+        # Get all string parameter values
+        strings = {k: i for k, i in self.flatten().items() if
+                   (i.isType("string")
+                   and not i.isEmpty())}
+        stringSizes = [len(i.value) for i in strings.items()]
+
+        # Get the largest string value and update dimension S
+        if(len(stringSizes)):
+            self.setDim("S", max(stringSizes)[-1])
+
+        # Pad all string arrays
+        for k in strings:
+            amountToPad = self.getDim("S") - strings[k].value.shape[-1]
+            if(amountToPad > 0):
+                # Pad the appropriate amount of null characters to each string
+                padamount = np.zeros((len(strings[k].shape), 2),
+                                     dtype=np.int64)
+                padamount[-1][-1] = amountToPad
+                self.getParam(k, True).paddedValue = np.pad(strings[k].value,
+                                                            amountToPad,
+                                                            'constant')
+
     def _getConvention(self, conv, version, specVersion):
         conventionData = self._getData("""SELECT convention_names.name as name,
                                                  conventions.id,
@@ -245,7 +268,7 @@ class SOFASonix:
                 parsedParams[pc] = {}
 
             # Unserialize data where necessary
-            if(pi["type"] == "double"):
+            if(pi["type"] in ["double", "string"]):
                 pi["value"] = np.array(json.loads(pi["value"])) \
                     if pi["value"] else np.array([])
 
@@ -371,10 +394,57 @@ class SOFASonix:
                     param.value = str(value)
                 # Dealing with STRING (placeholder)
                 elif(param.isType("string")):
-                    param.value = str(value)
-                    # Update dimension S
-                    if(len(param.value) > self.getDim("S")):
-                        self.setDim("S", len(param.value))
+                    if(type(value) in [list, np.ndarray]):
+                        length = len(value) if type(value) == list\
+                            else value.size
+                        if(length):
+                            if(type(value) == list):
+                                # Check if all elements are strings
+                                allStrings = all([type(v) == str
+                                                  for v in value])
+                                if(not allStrings):
+                                    raise SOFAFieldError(("Submitted list data"
+                                                          " for '{}' must only"
+                                                          " contain strings"
+                                                          ).format(key))
+
+                                # Create a numpy array with nullspaces
+                                maxS = max(map(len, value))
+                                # Create an array to store the values
+                                stringArray = np.zeros((len(value), maxS),
+                                                       dtype=np.string_)
+                                # Append values
+                                for i in value:
+                                    iv = list(i)
+                                    stringArray[:len(iv)] = iv
+
+                                # Store string array
+                                param.value = stringArray
+                                param.paddedValue = stringArray
+
+                            # Otherwise assume a character array
+                            else:
+                                if(value.dtype != "S1"):
+                                    raise SOFAFieldError(("Array submitted for"
+                                                          " parameter '{}'"
+                                                          " must be a "
+                                                          "character array of "
+                                                          "dtype 'S1'"
+                                                          ).format(key))
+                                param.value = value
+                                param.paddedValue = stringArray
+
+                        else:
+                            raise SOFAFieldError(("Empty array or list "
+                                                  "submitted for parameter "
+                                                  "'{}'").format(key))
+                        # Update dimension S and pad all character arrays
+                        self._updateStrings()
+                    else:
+                        raise SOFAFieldError(("Parameter '{}' of type string "
+                                              "must either have a list of "
+                                              "strings or a numpy character"
+                                              "array.").format(key))
                 # Double
                 elif(param.isType("double")):
                     if(type(value) in [list, np.ndarray]):
@@ -463,16 +533,27 @@ class SOFASonix:
         try:
             attributes = self.flatten()
             # Extract doubles.
-            variables = {k: attributes.pop(k) for k in list(attributes.keys())
-                         if attributes[k].isType("double")}
+            doubles = {k: attributes.pop(k) for k in list(attributes.keys())
+                       if attributes[k].isType("double")}
+            # Extract strings
+            strings = {k: attributes.pop(k) for k in list(attributes.keys())
+                       if attributes[k].isType("string")}
 
             dsets = {}
-            # Create all variables first.
-            for key, element in variables.items():
-                value = h5py.Empty("f") if (element.value.size == 0) \
+
+            # Create all doubles first.
+            for key, element in doubles.items():
+                value = h5py.Empty("float64") if element.isEmpty() \
                     else element.value
                 dsets[key] = file.create_dataset(key, data=value)
 
+            # Create strings
+            for key, element in strings.items():
+                value = h5py.Empty("S1") if element.isEmpty() else\
+                    element.z
+                dsets[key] = file.create_dataset(key, data=value, dtype="S1")
+
+            # Create parameters for dimensions
             if(dims and self.convention["data_group"] == "IR"):
                 for k, i in self.dims.items():
                     file.create_dataset(k, data=np.zeros(i["value"]))
@@ -526,6 +607,10 @@ class SOFASonixField:
         # Set parameters
         for key, value in params.items():
             setattr(self, key, value)
+        # Create parameter for string data type
+        # to store padded null valued arrays
+        if(self.isType("string")):
+            self.paddedValue = value
 
     def isType(self, type_str):
         return self.type.lower() == str(type_str).lower()
@@ -678,7 +763,7 @@ class SOFASonixField:
                                       "'{}'").format(self.name))
 
     def checkDimensions(self):
-        if(self.isType("double")):
+        if(self.isType("double") or self.isType("string")):
             match = False
             for dSet in self.dimensions:
                 values = [self.parent.getDim(dim) for dim in dSet]
