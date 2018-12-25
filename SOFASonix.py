@@ -502,6 +502,9 @@ class SOFASonix:
                             for i, dim in enumerate(param.dimensions[0]):
                                 # If lowercase, define dim (assumption [0])
                                 if(dim.lower() == dim):
+                                    print(("Setting dimension '{}' from "
+                                           "parameter '{}'"
+                                           ).format(dim, param.name))
                                     self.setDim(dim, value.shape[i])
                         else:
                             raise SOFAFieldError(("Parameter '{}' of type "
