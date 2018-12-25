@@ -649,7 +649,7 @@ class SOFASonix:
             # Create strings
             for key, element in strings.items():
                 value = h5py.Empty("S1") if element.isEmpty() else\
-                    element.z
+                    element.paddedValue
                 dsets[key] = file.create_dataset(key, data=value, dtype="S1")
 
             # Create parameters for dimensions
