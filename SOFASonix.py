@@ -345,8 +345,9 @@ class SOFASonix:
                     sofa.setParam(key, raw[key][:], force=True)
 
         # Update dimension strings for unclassed params
-        for param in sofa.params["__unclassed"].values():
-            param._matchDims()
+        if("__unclassed" in sofa.params):
+            for param in sofa.params["__unclassed"].values():
+                param._matchDims()
 
         # Now set attributes
         for attr in raw.attrs.keys():
