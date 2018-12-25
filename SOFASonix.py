@@ -10,9 +10,9 @@ import os
 class SOFASonix:
     APIName = "SOFASonix"
     APIVersion = "1.0"
+    dbfile = "ss_db.db"
 
     def __init__(self, conv, version=False, specVersion=False, load=False,
-                 dbfile="ss_db.db",
                  **dims):
         # Create DB Path
         try:
@@ -20,7 +20,7 @@ class SOFASonix:
         except NameError:
             cwdpath = os.path.dirname(os.path.realpath('__file__'))
         finally:
-            self.dbpath = "{}/{}".format(cwdpath, dbfile)
+            self.dbpath = "{}/{}".format(cwdpath, self.dbfile)
 
         # Return convention data if valid params supplied.
         self.convention = self._getConvention(conv, version, specVersion)
@@ -344,12 +344,23 @@ class SOFASonix:
                 if(raw[key].shape is not None):
                     sofa.setParam(key, raw[key][:], force=True)
 
+        # Update dimension strings for unclassed params
+        for param in sofa.params["__unclassed"].values():
+            param._matchDims()
+
         # Now set attributes
         for attr in raw.attrs.keys():
             # Empty check
             if(raw.attrs[attr].shape is not None):
-                sofa.setParam(attr, raw.attrs[attr].decode('utf-8'),
-                              force=True)
+                try:
+                    sofa.setParam(attr, raw.attrs[attr].decode('utf-8'),
+                                  force=True)
+                except UnicodeDecodeError:
+                    print(("Unable to decode key '{}' - SOFASonix supports "
+                           "only utf-8 decoding. The parameter has been "
+                           "imported in its binary form").format(attr))
+                    sofa.setParam(attr, raw.attrs[attr][:],
+                                  force=True)
 
         # If modified (foreign parameters), add modified to convention name
         if(sofa.modified):
@@ -476,22 +487,27 @@ class SOFASonix:
             else:
                 raise SOFAFieldError(("Cannot edit parameter '{}'. "
                                       "Read only.").format(key))
-        # Force insertion of foreign parameter
+        # Force insertion of foreign parameter -- use for load ONLY
         elif force:
             print("Inserting foreign parameter: '{}'".format(key))
             # Find out parameter type
-            if(type(value) == str):
+            if(type(value) == str or type(value) == bytes):
                 inputType = "attribute"
                 inputDims = 0
             else:
-                inputType = "double"
+                # Disable dims check unless _matchDims() is called on param
+                inputDims = 0
                 try:
                     value = np.array(value)
-                    inputDims = value.shape
                 except Exception:
                     raise SOFAFieldError("""Invalid parameter input. Please "
                                          "insert a valid string, list or "
-                                         "numpy array""")
+                                         "numpy array.""")
+                # Check if character array or numerical
+                if(np.issubdtype(value.dtype, np.string_)):
+                    inputType = "string"
+                else:
+                    inputType = "double"
             # If an unclassed variable is introduced for the first time
             if("__unclassed" not in self.params):
                 self.params["__unclassed"] = {}
@@ -684,6 +700,21 @@ class SOFASonixField:
                     break
         return passed
 
+    def _matchDims(self):
+        if((self.isType("double") or self.isType("string"))
+                and self.inClass("__unclassed") and not self.dimensions):
+            # Try to match dimensions
+            dimensions = ""
+            for num in self.value.shape:
+                for dim, dimParams in self.parent.dims.items():
+                    if(dimParams["value"] == num):
+                        dimensions += dim
+            if(len(dimensions) != len(self.value.shape)):
+                raise SOFAError("Unable to import correct dimensions "
+                                "for parameter {}".format(self.name))
+            else:
+                self.dimensions = [dimensions]
+
     def checkValueConstraints(self):
         if(self.value_restrictions):
             if(self.value_restrictions["type"] == "regular"):
@@ -772,19 +803,22 @@ class SOFASonixField:
 
     def checkDimensions(self):
         if(self.isType("double") or self.isType("string")):
-            match = False
-            for dSet in self.dimensions:
-                values = [self.parent.getDim(dim) for dim in dSet]
-                if(list(self.value.shape) == values):
-                    match = True
-                    break
-            # If dimensions are not matched, raise exception
-            if(not match):
-                raise SOFAFieldError(("Incorrect dimensions for '{}'\n"
-                                      "Required: {}\n"
-                                      "Current: {}"
-                                      ).format(self.name, self.dimensions,
-                                               list(self.value.shape)))
+            # Check if not force-input without dimensions matching
+            if(self.dimensions):
+                # Perform dimensions check
+                match = False
+                for dSet in self.dimensions:
+                    values = [self.parent.getDim(dim) for dim in dSet]
+                    if(list(self.value.shape) == values):
+                        match = True
+                        break
+                # If dimensions are not matched, raise exception
+                if(not match):
+                    raise SOFAFieldError(("Incorrect dimensions for '{}'\n"
+                                          "Required: {}\n"
+                                          "Current: {}"
+                                          ).format(self.name, self.dimensions,
+                                                   list(self.value.shape)))
 
 
 class SOFAError(Exception):
