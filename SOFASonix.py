@@ -36,21 +36,23 @@ class SOFASonix:
         self.params = self._getParams(self.convention["id"])
 
         # Assign application information
-        self.params["global"]["APIName"].value = self.APIName
-        self.params["global"]["APIVersion"].value = self.APIVersion
+        self.getParam("GLOBAL:APIName", True).value = self.APIName
+        self.getParam("GLOBAL:APIVersion", True).value = self.APIVersion
 
         # Check if creating new SOFA file or loading an existing one
         if(load is False):
             # Date timestamps
-            self.params["global"]["DateCreated"].value = self._time()
+            self.getParam("GLOBAL:DateCreated", True).value = self._time()
             # Date modified - Updated on SAVE
-            self.params["global"]["DateModified"].value = self._time()
+            self.getParam("GLOBAL:DateModified", True).value = self._time()
 
     def __setattr__(self, name, value):
         # Quick set dimensions if supplied.
         if (name[0] == "_"):
             self.setDim(name.strip("_"), value)
         else:
+            # Print global parameter {} explicitly set
+            # TODO: Both for get and set
             # Quick set parameters if supplied.
             params = [i.replace(":", "_").replace(".", "_").lower()
                       for i in self.flatten()]
@@ -240,7 +242,6 @@ class SOFASonix:
         for key, unitSet in units.items():
             units[key] = json.loads(unitSet)
             units[key].append(key)
-
         return units
 
     def _getParams(self, convention_id):
@@ -279,10 +280,6 @@ class SOFASonix:
             if(pi["type"] in ["double", "string"]):
                 pi["value"] = np.array(json.loads(pi["value"])) \
                     if pi["value"] else np.array([])
-
-            # Remove global keyword from name if present
-            if(pc == "global"):
-                pi["name"] = pi["name"].replace("GLOBAL:", "")
 
             pi["dimensions"] = json.loads(pi["dimensions"])
             properties = json.loads(pi.pop("properties"))
@@ -338,23 +335,45 @@ class SOFASonix:
                     sofa.convention["data_group"] == "IR"):
                 # Need to solve dimensions constraints
                 sofa.setDim(key, raw[key][:].shape[0], force=True)
-            # Otherwise set each double parameter.
+            # Otherwise set each double/string parameter.
             else:
                 # Empty check
                 if(raw[key].shape is not None):
                     sofa.setParam(key, raw[key][:], force=True)
+                # Check for attributes
+                for attr in raw[key].attrs.keys():
+                    if(raw[key].attrs[attr].shape is not None):
+                        paramName = "{}:{}".format(key, attr)
+                        attribute = raw[key].attrs[attr]
+                        try:
+                            # Check for object references:
+                            if(type(attribute) == np.ndarray):
+                                # Ignore dimensions references for now
+                                pass
+                            else:
+                                sofa.setParam(paramName,
+                                              attribute.decode('utf-8'),
+                                              force=True)
+                        except UnicodeDecodeError:
+                            print(("Unable to decode key '{}' - SOFASonix "
+                                   "supports only utf-8 decoding. The "
+                                   "parameter has been imported in its binary "
+                                   "form").format(attr))
+                            sofa.setParam(paramName, raw[key].attrs[attr][:],
+                                          force=True)
 
-        # Update dimension strings for unclassed params
+        # Match dimension strings for unclassed params
         if("__unclassed" in sofa.params):
             for param in sofa.params["__unclassed"].values():
                 param._matchDims()
 
-        # Now set attributes
+        # Now set global attributes
         for attr in raw.attrs.keys():
             # Empty check
             if(raw.attrs[attr].shape is not None):
                 try:
-                    sofa.setParam(attr, raw.attrs[attr].decode('utf-8'),
+                    sofa.setParam("GLOBAL:{}".format(attr),
+                                  raw.attrs[attr].decode('utf-8'),
                                   force=True)
                 except UnicodeDecodeError:
                     print(("Unable to decode key '{}' - SOFASonix supports "
@@ -365,19 +384,21 @@ class SOFASonix:
 
         # If modified (foreign parameters), add modified to convention name
         if(sofa.modified):
-            sofa.params["global"]["SOFAConventions"]["value"] += " (modified)"
+            sofa.getParam("GLOBAL:SOFAConventions").value += " (modified)"
 
         # Close h5py file and return SimpleSOFA object
         raw.close()
         return sofa
 
     def getDim(self, dim):
+        dim = dim.upper()
         if(dim in self.dims):
             return self.dims[dim]["value"]
         else:
             raise SOFAError("Dimension '{}' does not exist")
 
     def setDim(self, dim, value, force=False):
+        dim = dim.upper()
         if(dim in self.dims):
             if (self.dims[dim]["ro"] and force is False):
                 raise SOFAError("Dimension '{}' is read-only.".format(dim))
@@ -471,7 +492,17 @@ class SOFASonix:
                         value = np.array(value)
                         # Check if array is numeric
                         if(np.issubdtype(value.dtype, np.number)):
+                            # Check number of dimensions
+                            param.checkDimensionsLength(value)
+
+                            # Add value if length has passed
                             param.value = value
+
+                            # Check if parameter defines dimensions
+                            for i, dim in enumerate(param.dimensions[0]):
+                                # If lowercase, define dim (assumption [0])
+                                if(dim.lower() == dim):
+                                    self.setDim(dim, value.shape[i])
                         else:
                             raise SOFAFieldError(("Parameter '{}' of type "
                                                   "'double' cannot contain "
@@ -550,7 +581,7 @@ class SOFASonix:
             self.validate(category)
 
         # Set new DateModified value
-        self.params["global"]["DateModified"].value = self._time()
+        self.getParam("GLOBAL:DateModified", True).value = self._time()
 
         # Create file and attempt saving.
         file = h5py.File("{}.sofa".format(filename), "w")
@@ -585,13 +616,12 @@ class SOFASonix:
 
             # Create attributes
             for key, element in attributes.items():
-                variable, attrname = key.split(":") if ":" in key \
-                    else ("", key)
-
+                variable, attrname = key.split(":") if (":" in key)\
+                    else ["global", key]
                 value = np.string_(element.value)
-
                 # For global attributes, create in root
-                if(variable == ""):
+                if(key in self.params["global"] or
+                   variable.lower() == "global"):
                     file.attrs[attrname] = value
                 # Otherwise create the attribute within the variable
                 else:
@@ -802,14 +832,31 @@ class SOFASonixField:
                 raise SOFAFieldError(("Invalid value_restrictions type for "
                                       "'{}'").format(self.name))
 
+    def checkDimensionsLength(self, prospective=False):
+        value = prospective if(type(prospective) == np.ndarray
+                               and prospective.size) else self.value
+        shapeLength = len(value.shape)
+        # Get dimension length
+        dimensionsLength = len(self.dimensions[0])
+
+        if(shapeLength != dimensionsLength):
+            raise SOFAFieldError(("'{}' is expecting a {}-dimensional input "
+                                  "({})\nYou supplied: {} dimensions"
+                                  ).format(self.name, dimensionsLength,
+                                           self.dimensions, shapeLength))
+
     def checkDimensions(self):
         if(self.isType("double") or self.isType("string")):
             # Check if not force-input without dimensions matching
             if(self.dimensions):
+                # Check dimensions length check
+                self.checkDimensionsLength()
+
                 # Perform dimensions check
                 match = False
                 for dSet in self.dimensions:
-                    values = [self.parent.getDim(dim) for dim in dSet]
+                    values = [self.parent.getDim(dim) for
+                              dim in dSet]
                     if(list(self.value.shape) == values):
                         match = True
                         break
