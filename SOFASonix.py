@@ -12,7 +12,16 @@ class SOFASonix:
     APIVersion = "1.0"
 
     def __init__(self, conv, version=False, specVersion=False, load=False,
+                 dbfile="ss_db.db",
                  **dims):
+        # Create DB Path
+        try:
+            cwdpath = os.path.dirname(os.path.realpath(__file__))
+        except NameError:
+            cwdpath = os.path.dirname(os.path.realpath('__file__'))
+        finally:
+            self.dbpath = "{}/{}".format(cwdpath, dbfile)
+
         # Return convention data if valid params supplied.
         self.convention = self._getConvention(conv, version, specVersion)
         self.modified = False  # Check whether convention has been modified
@@ -77,10 +86,9 @@ class SOFASonix:
         return datetime.datetime.now().replace(
             microsecond=0).isoformat().replace("T", " ")
 
-    def _getData(self, query, dbfile="ss_db.db"):
+    def _getData(self, query):
         try:
-            path = os.path.dirname(os.path.abspath("__file__"))
-            db = sqlite3.connect("{}/{}".format(path, dbfile))
+            db = sqlite3.connect(self.dbpath)
             cursor = db.cursor()
             cursor.execute(query)
             data = cursor.fetchall()
