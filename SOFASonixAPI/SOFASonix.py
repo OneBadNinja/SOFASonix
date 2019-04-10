@@ -45,8 +45,8 @@ import sqlite3
 import pandas as pd
 import datetime
 import os
-from SOFASonixField import SOFASonixField
-from SOFASonixError import SOFAError, SOFAFieldError
+from .SOFASonixField import SOFASonixField
+from .SOFASonixError import SOFAError, SOFAFieldError
 
 
 class SOFASonix:

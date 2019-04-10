@@ -38,7 +38,7 @@
 #
 # =============================================================================
 
-from SOFASonixError import SOFAFieldError, SOFAError
+from .SOFASonixError import SOFAFieldError, SOFAError
 import numpy as np
 
 
