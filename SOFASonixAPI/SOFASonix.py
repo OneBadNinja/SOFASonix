@@ -38,7 +38,7 @@
 #
 # =============================================================================
 
-import h5py
+import netCDF4
 import numpy as np
 import json
 import sqlite3
@@ -355,52 +355,40 @@ class SOFASonix:
         return flat
 
     def load(file):
-        raw = h5py.File(file)
+        raw = netCDF4.Dataset(file, "r", "NETCDF4")
         # Try to find a convention
         try:
-            convention = raw.attrs["SOFAConventions"].decode('utf-8')
-            version = float(raw.attrs["SOFAConventionsVersion"].decode(
-                    "utf-8"))
-            specversion = float(raw.attrs["Version"].decode("utf-8"))
+            convention = raw.SOFAConventions
+            version = float(raw.SOFAConventionsVersion)
+            specversion = float(raw.Version)
         except Exception:
             raise SOFAError("Invalid SOFA file. No convention specified.")
 
         # Create a convention file.
         sofa = SOFASonix(convention, version, specversion, load=True)
 
+        # Set dimensions if applicable
+        for dim in raw.dimensions:
+            if(dim in sofa.dims.keys()):
+                sofa.setDim(dim, len(raw.dimensions[dim]), force=True)
+
         # Populate with datasets and attributes - single dimension (sufficient)
-        for key in raw.keys():
-            # If datatype IR and dims are provided as doubles, set them.
-            if (key in sofa.dims.keys() and
-                    sofa.convention["data_group"] == "IR"):
-                # Need to solve dimensions constraints
-                sofa.setDim(key, raw[key][:].shape[0], force=True)
-            # Otherwise set each double/string parameter.
-            else:
-                # Empty check
-                if(raw[key].shape is not None):
-                    sofa.setParam(key, raw[key][:], force=True)
-                # Check for attributes
-                for attr in raw[key].attrs.keys():
-                    if(raw[key].attrs[attr].shape is not None):
-                        paramName = "{}:{}".format(key, attr)
-                        attribute = raw[key].attrs[attr]
-                        try:
-                            # Check for object references:
-                            if(type(attribute) == np.ndarray):
-                                # Ignore dimensions references for now
-                                pass
-                            else:
-                                sofa.setParam(paramName,
-                                              attribute.decode('utf-8'),
-                                              force=True)
-                        except UnicodeDecodeError:
-                            print(("Unable to decode key '{}' - SOFASonix "
-                                   "supports only utf-8 decoding. The "
-                                   "parameter has been imported in its binary "
-                                   "form").format(attr))
-                            sofa.setParam(paramName, raw[key].attrs[attr][:],
-                                          force=True)
+        for key in raw.variables:
+            # Empty check
+            if(raw[key].shape is not None):
+                dat = np.array(raw[key][:].tolist())
+                sofa.setParam(key, dat, force=True)
+            # Check for attributes
+            for attr in raw[key].ncattrs():
+                attribute = getattr(raw[key], attr)
+                if(attribute):
+                    paramName = "{}:{}".format(key, attr)
+                    try:
+                        sofa.setParam(paramName,
+                                      attribute,
+                                      force=True)
+                    except Exception as e:
+                        raise Exception(e)
 
         # Match dimension strings for unclassed params
         if("__unclassed" in sofa.params):
@@ -408,25 +396,22 @@ class SOFASonix:
                 param._matchDims()
 
         # Now set global attributes
-        for attr in raw.attrs.keys():
+        for attr in raw.ncattrs():
             # Empty check
-            if(raw.attrs[attr].shape is not None):
+            attribute = getattr(raw, attr)
+            if(attribute):
                 try:
                     sofa.setParam("GLOBAL:{}".format(attr),
-                                  raw.attrs[attr].decode('utf-8'),
+                                  attribute,
                                   force=True)
-                except UnicodeDecodeError:
-                    print(("Unable to decode key '{}' - SOFASonix supports "
-                           "only utf-8 decoding. The parameter has been "
-                           "imported in its binary form").format(attr))
-                    sofa.setParam(attr, raw.attrs[attr][:],
-                                  force=True)
+                except Exception as e:
+                    raise Exception(e)
 
         # If modified (foreign parameters), add modified to convention name
         if(sofa.modified):
             sofa.getParam("GLOBAL:SOFAConventions").value += " (modified)"
 
-        # Close h5py file and return SimpleSOFA object
+        # Close h5py file and return SOFASonix object
         raw.close()
         return sofa
 
@@ -618,7 +603,7 @@ class SOFASonix:
                 param.checkRequirements()
                 param.checkValueConstraints()
 
-    def export(self, filename, dims=True):
+    def export(self, filename):
         # Perform field-by-field validation
         for category in self.params:
             self.validate(category)
@@ -627,35 +612,36 @@ class SOFASonix:
         self.getParam("GLOBAL:DateModified", True).value = self._time()
 
         # Create file and attempt saving.
-        file = h5py.File("{}.sofa".format(filename), "w")
+        file = netCDF4.Dataset("{}.sofa".format(filename), "w",
+                               format="NETCDF4")
 
         try:
+            # Create dimensions
+            for dim in self.dims.keys():
+                file.createDimension(dim, self.dims[dim]["value"])
+
             attributes = self.flatten()
             # Extract doubles.
             doubles = {k: attributes.pop(k) for k in list(attributes.keys())
                        if attributes[k].isType("double")}
+
             # Extract strings
             strings = {k: attributes.pop(k) for k in list(attributes.keys())
                        if attributes[k].isType("string")}
 
-            dsets = {}
-
             # Create all doubles first.
             for key, element in doubles.items():
-                value = h5py.Empty("float64") if element.isEmpty() \
-                    else element.value
-                dsets[key] = file.create_dataset(key, data=value)
+                if(not element.isEmpty()):
+                    var = file.createVariable(key, "f8",
+                                              element.getDimensions())
+                    var[:] = element.value
 
             # Create strings
             for key, element in strings.items():
-                value = h5py.Empty("S1") if element.isEmpty() else\
-                    element.paddedValue
-                dsets[key] = file.create_dataset(key, data=value, dtype="S1")
-
-            # Create parameters for dimensions
-            if(dims and self.convention["data_group"] == "IR"):
-                for k, i in self.dims.items():
-                    file.create_dataset(k, data=np.zeros(i["value"]))
+                if(not element.isEmpty()):
+                    var = file.createVariable(key, "S1",
+                                              element.getDimensions())
+                    var[:] = element.paddedValue
 
             # Create attributes
             for key, element in attributes.items():
@@ -665,10 +651,10 @@ class SOFASonix:
                 # For global attributes, create in root
                 if(key in self.params["global"] or
                    variable.lower() == "global"):
-                    file.attrs[attrname] = value
+                    setattr(file, attrname, value)
                 # Otherwise create the attribute within the variable
                 else:
-                    dsets[variable].attrs[attrname] = value
+                    setattr(file[variable], attrname, value)
             file.close()
         except Exception:
             # Close file if errors encountered and re-raise exception.

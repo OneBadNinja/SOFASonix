@@ -129,6 +129,8 @@ class SOFASonixField:
                 for dim, dimParams in self.parent.dims.items():
                     if(dimParams["value"] == num):
                         dimensions += dim
+                        # Only one dimension may correspond to each shape value
+                        break
             if(len(dimensions) != len(self.value.shape)):
                 raise SOFAError("Unable to import correct dimensions "
                                 "for parameter {}".format(self.name))
@@ -256,3 +258,10 @@ class SOFASonixField:
                                           "Current: {}"
                                           ).format(self.name, self.dimensions,
                                                    list(self.value.shape)))
+
+    def getDimensions(self):
+        for dimlist in self.dimensions:
+            dims = [self.parent.getDim(d_i) for d_i in dimlist]
+            if(dims == list(self.value.shape)):
+                return [i.upper() for i in dimlist]
+        raise ValueError("Cannot get dimensions")
