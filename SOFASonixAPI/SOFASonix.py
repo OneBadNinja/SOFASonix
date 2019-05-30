@@ -591,6 +591,13 @@ class SOFASonix:
             raise SOFAError("Invalid parameter supplied for convention: '{}'"
                             .format(self.convention["name"]))
 
+    def deleteParam(self, param):
+        for category in self.params.keys():
+            if(param in self.params[category].keys()):
+                del self.params[category][param]
+                return
+        raise ValueError("No parameter '{}' found to delete.".format(param))
+
     def validate(self, category=False):
         params = self.params[category].items() if category else\
             self.flatten().items()
