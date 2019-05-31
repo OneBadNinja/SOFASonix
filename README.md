@@ -56,6 +56,9 @@ pip install sofasonix
 ## Documentation
 SOFASonix documentation and example usage is available over at the [SOFASonix Wiki page](https://github.com/OneBadNinja/SOFASonix/wiki).
 
+## Templates
+SOFASonix is packaged with a Templates folder containing scripts for each convention to easily edit and generate SOFA files.
+
 ## Contribute
 You may contribute any improvements and fixes via regular pull-requests. These will be reviewed as per standard procedure before integration.
 

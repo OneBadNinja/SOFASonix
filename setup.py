@@ -3,13 +3,13 @@ from distutils.core import setup
 setup(
   name="SOFASonix",
   packages=["SOFASonix"],
-  version="1.0.2",
+  version="1.0.3",
   license='BSD 3-Clause',
   description="A Lightweight Python API for the AES69-2015 Spatially Oriented Format for Acoustics (SOFA) File Format",
   author='Ioseb Laghidze',
   author_email='developer@artisan-one.com',
   url='https://github.com/OneBadNinja/SOFASonix/',
-  download_url='https://github.com/OneBadNinja/SOFASonix/archive/1.0.2.tar.gz',
+  download_url='https://github.com/OneBadNinja/SOFASonix/archive/1.0.3.tar.gz',
   keywords=['SOFA', 'Spatially Oriented Format For Acoustics',
             'Audio', '3D Audio', 'Binaural', 'Transaural', 'Acoustics'],
   package_data={
