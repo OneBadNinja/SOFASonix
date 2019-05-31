@@ -45,12 +45,14 @@ import sqlite3
 import pandas as pd
 import datetime
 import os
-from .SOFASonixAPI import SOFASonixAPI
 from .SOFASonixField import SOFASonixField
 from .SOFASonixError import SOFAError, SOFAFieldError
 
 
 class SOFASonix(object):
+    APIName = "SOFASonix"
+    APIVersion = "1.0.2"
+    DBFile = "ss_db.db"
 
     def __init__(self, conv, version=False, specVersion=False, load=False,
                  **dims):
@@ -60,7 +62,7 @@ class SOFASonix(object):
         except NameError:
             cwdpath = os.path.dirname(os.path.realpath('__file__'))
         finally:
-            self.dbpath = "{}/{}".format(cwdpath, SOFASonixAPI.getDBFile())
+            self.dbpath = "{}/{}".format(cwdpath, SOFASonix.DBFile)
 
         # Return convention data if valid params supplied.
         self.convention = self._getConvention(conv, version, specVersion)
@@ -77,9 +79,9 @@ class SOFASonix(object):
 
         # Assign application information
         self.getParam("GLOBAL:APIName",
-                      True).value = SOFASonixAPI.getName()
+                      True).value = SOFASonix.APIName
         self.getParam("GLOBAL:APIVersion",
-                      True).value = SOFASonixAPI.getVersion()
+                      True).value = SOFASonix.APIVersion
 
         # Check if creating new SOFA file or loading an existing one
         if(load is False):

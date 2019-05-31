@@ -47,7 +47,9 @@ pip install sofasonix
 ||0.6|0.4|
 |SimpleFreeFieldSOS|1.0|1.0|
 |SingleRoomDRIR|1.0|0.3|
-|SingleRoomDRIR|0.5|0.1|
+||0.5|0.1|
+|MusicalInstrumentDirectivity|1.0|1.0|
+|FreeFieldDirectivityTF|1.0|0.1|
 
 **Note:** While some of these versions are deprecated according to [SOFAConventions](http://www.sofaconventions.org), they have been included to maintain backwards compatibility for both older SOFA files and older applications that may be using them. It is always recommended to use the latest versions for generating files for storage.
 
