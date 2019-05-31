@@ -15,6 +15,14 @@ SOFASonix was initially developed as a supplementary tool for usage alongside an
 - Powered by the lightweight and powerful SQLite3, providing support for different versions of each convention.
 - Simple syntax for quickly generating / reading SOFA files.
 
+## Installation
+
+SOFASonix can be installed as a PyPI package using
+
+```
+pip install sofasonix
+```
+
 ## Supported Conventions
 
 <span id="supportedConventions">The following</span> conventions are currently supported by SOFASonix for reading and writing, as per the [SOFAConventions website](https://www.sofaconventions.org/mediawiki/index.php/SOFA_conventions):

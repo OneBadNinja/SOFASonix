@@ -45,14 +45,12 @@ import sqlite3
 import pandas as pd
 import datetime
 import os
+from .SOFASonixAPI import SOFASonixAPI
 from .SOFASonixField import SOFASonixField
 from .SOFASonixError import SOFAError, SOFAFieldError
 
 
-class SOFASonix:
-    APIName = "SOFASonix"
-    APIVersion = "1.0"
-    dbfile = "ss_db.db"
+class SOFASonix(object):
 
     def __init__(self, conv, version=False, specVersion=False, load=False,
                  **dims):
@@ -62,7 +60,7 @@ class SOFASonix:
         except NameError:
             cwdpath = os.path.dirname(os.path.realpath('__file__'))
         finally:
-            self.dbpath = "{}/{}".format(cwdpath, self.dbfile)
+            self.dbpath = "{}/{}".format(cwdpath, SOFASonixAPI.getDBFile())
 
         # Return convention data if valid params supplied.
         self.convention = self._getConvention(conv, version, specVersion)
@@ -78,8 +76,10 @@ class SOFASonix:
         self.params = self._getParams(self.convention["id"])
 
         # Assign application information
-        self.getParam("GLOBAL:APIName", True).value = self.APIName
-        self.getParam("GLOBAL:APIVersion", True).value = self.APIVersion
+        self.getParam("GLOBAL:APIName",
+                      True).value = SOFASonixAPI.getName()
+        self.getParam("GLOBAL:APIVersion",
+                      True).value = SOFASonixAPI.getVersion()
 
         # Check if creating new SOFA file or loading an existing one
         if(load is False):
@@ -103,7 +103,7 @@ class SOFASonix:
                               [params.index(nameTrim)], value)
             # Otherwise assign normally
             else:
-                super().__setattr__(name, value)
+                super(SOFASonix, self).__setattr__(name, value)
 
     def __getattr__(self, name):
         error = ("'{}' object has no attribute '{}'"
@@ -326,8 +326,11 @@ class SOFASonix:
 
             # Create a SOFASonixField object
             name = pi.pop("name")
+            fieldParams = {}
+            fieldParams.update(pi)
+            fieldParams.update(properties)
             parsedParams[pc][name] = SOFASonixField(self, name, pc, units,
-                                                    {**pi, **properties})
+                                                    fieldParams)
 
         return parsedParams
 
@@ -354,6 +357,7 @@ class SOFASonix:
             {flat.update(category) for category in self.params.values()}
         return flat
 
+    @staticmethod
     def load(file):
         raw = netCDF4.Dataset(file, "r", "NETCDF4")
         # Try to find a convention
@@ -550,8 +554,14 @@ class SOFASonix:
         # Force insertion of foreign parameter -- use for load ONLY
         elif force:
             print("Inserting foreign parameter: '{}'".format(key))
+            # Python2 fix
+            try:
+                basetype = unicode
+            except NameError:
+                basetype = str
+
             # Find out parameter type
-            if(type(value) == str or type(value) == bytes):
+            if(type(value) in [str, basetype, bytes]):
                 inputType = "attribute"
                 inputDims = 0
             else:
@@ -581,11 +591,13 @@ class SOFASonix:
                       "dimensions": inputDims,
                       "ro": 0}
             properties = params.pop("properties")
+            fieldParams = {}
+            fieldParams.update(params)
+            fieldParams.update(properties)
             self.params["__unclassed"][key] = SOFASonixField(self, key,
                                                              "__unclassed",
                                                              self._getUnits(),
-                                                             {**params,
-                                                              **properties})
+                                                             fieldParams)
 
         else:
             raise SOFAError("Invalid parameter supplied for convention: '{}'"
@@ -654,14 +666,13 @@ class SOFASonix:
             for key, element in attributes.items():
                 variable, attrname = key.split(":") if (":" in key)\
                     else ["global", key]
-                value = np.string_(element.value)
                 # For global attributes, create in root
                 if(key in self.params["global"] or
                    variable.lower() == "global"):
-                    setattr(file, attrname, value)
+                    setattr(file, attrname, element.value)
                 # Otherwise create the attribute within the variable
                 else:
-                    setattr(file[variable], attrname, value)
+                    setattr(file[variable], attrname, element.value)
             file.close()
         except Exception:
             # Close file if errors encountered and re-raise exception.
