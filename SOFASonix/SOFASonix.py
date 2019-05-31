@@ -689,7 +689,7 @@ class SOFASonix(object):
             pi = params[i]
             value = "{} Array".format(pi.value.shape) if \
                 (pi.isType("double") or pi.isType("string")) else pi.value
-            rows.append([".{}".format(i.replace(":", "_").replace(".", "_")),
+            rows.append([".{}".format(i.getShorthandName()),
                          pi.type[0].upper(),
                          value,
                          pi.isReadOnly(),

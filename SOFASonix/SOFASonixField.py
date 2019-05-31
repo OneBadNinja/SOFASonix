@@ -265,3 +265,6 @@ class SOFASonixField:
             if(dims == list(self.value.shape)):
                 return [i.upper() for i in dimlist]
         raise ValueError("Cannot get dimensions")
+
+    def getShorthandName(self):
+        return self.name.replace(":", "_").replace(".", "_")
