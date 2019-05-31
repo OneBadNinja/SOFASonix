@@ -51,7 +51,7 @@ from .SOFASonixError import SOFAError, SOFAFieldError
 
 class SOFASonix(object):
     APIName = "SOFASonix"
-    APIVersion = "1.0.3"
+    APIVersion = "1.0.31"
     DBFile = "ss_db.db"
 
     def __init__(self, conv, version=False, specVersion=False, load=False,
@@ -689,7 +689,7 @@ class SOFASonix(object):
             pi = params[i]
             value = "{} Array".format(pi.value.shape) if \
                 (pi.isType("double") or pi.isType("string")) else pi.value
-            rows.append([".{}".format(i.getShorthandName()),
+            rows.append([".{}".format(pi.getShorthandName()),
                          pi.type[0].upper(),
                          value,
                          pi.isReadOnly(),
