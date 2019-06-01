@@ -100,13 +100,17 @@ class SOFASonix(object):
             self.setDim(name.strip("_"), value)
         else:
             # Quick set parameters if supplied.
-            params = [i.replace(":", "_").replace(".", "_").lower()
-                      for i in self.flatten()]
+            params = {i.getShorthandName().lower(): i
+                      for i in self.flatten().values()}
             nameTrim = name.lower()
 
             if(hasattr(self, "params") and nameTrim in params):
-                self.setParam(list(self.flatten().keys())
-                              [params.index(nameTrim)], value)
+                param = params[nameTrim]
+                # Perform shorthand removal if value is None
+                if(value is None):
+                    self.deleteParam(param.name)
+                else:
+                    self.setParam(param.name, value)
             # Otherwise assign normally
             else:
                 super(SOFASonix, self).__setattr__(name, value)
@@ -615,11 +619,34 @@ class SOFASonix(object):
                             .format(self.convention["name"]))
 
     def deleteParam(self, param):
+        deleteList = []
+        # Search for parameters to remove
         for category in self.params.keys():
-            if(param in self.params[category].keys()):
-                del self.params[category][param]
-                return
-        raise ValueError("No parameter '{}' found to delete.".format(param))
+            for field in self.params[category].values():
+                # Remove parameter
+                if(field.name == param):
+                    if(field.isRequired()):
+                        raise SOFAFieldError("Parameter '{}' is a required"
+                                             " parameter and cannot be "
+                                             "removed!".format(field.name))
+                    else:
+                        deleteList.append([category, field.name])
+                        print("Removed '{}'".format(field.name))
+                # Remove any associated attributes if applicable
+                if(field.name.startswith("{}:".format(param))):
+                    if(field.isRequired()):
+                        print("WARNING: Associated attribute '{}' is a "
+                              "required parameter and cannot "
+                              "be automatically removed!".format(field.name))
+                    else:
+                        print("Removed associated attribute '{}'"
+                              .format(field.name))
+                        deleteList.append([category, field.name])
+        if(len(deleteList)):
+            for pair in deleteList:
+                del self.params[pair[0]][pair[1]]
+        else:
+            print("No parameter '{}' found to delete.".format(param))
 
     def validate(self, category=False):
         params = self.params[category].items() if category else\
