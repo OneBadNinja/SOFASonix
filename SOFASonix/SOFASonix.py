@@ -51,7 +51,7 @@ from .SOFASonixError import SOFAError, SOFAFieldError
 
 class SOFASonix(object):
     APIName = "SOFASonix"
-    APIVersion = "1.0.4"
+    APIVersion = "1.0.5"
     DBFile = "ss_db.db"
 
     def __init__(self, conv, version=False, specVersion=False, load=False,
