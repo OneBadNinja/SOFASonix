@@ -31,7 +31,7 @@
 #
 # =============================================================================
 #
-#                           File: SimpleFreeFieldTF.py
+#                           File: SimpleFreeFieldSOS_1.0_1.0.py
 #                           Project: SOFASonix
 #                           Author: I.Laghidze
 #                           License: BSD 3
@@ -45,14 +45,12 @@ import numpy as np
 =============================== Initial Config ================================
 """
 
-# Create SOFAFile object with the latest SimpleFreeFieldTF convention
-sofa = SOFAFile("SimpleFreeFieldTF", version=1.0, specVersion=1.0)
+# Create SOFAFile object with the latest SimpleFreeFieldSOS convention
+sofa = SOFAFile("SimpleFreeFieldSOS", version=1.0, specVersion=1.0)
 
 # Set dimensions
 sofa._M = 100
 sofa._N = 1024
-sofa._R = 2
-sofa._E = 4
 
 # View parameters of convention
 sofa.view()
@@ -65,13 +63,13 @@ sofa.view()
 # ----- Mandatory attributes -----
 sofa.GLOBAL_AuthorContact = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
-sofa.GLOBAL_ListenerShortName = ""
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "free field"
-sofa.GLOBAL_DateCreated = "2019-06-01 01:28:56"
-sofa.GLOBAL_DateModified = "2019-06-01 01:28:56"
+sofa.GLOBAL_DateCreated = "2019-06-01 01:46:34"
+sofa.GLOBAL_DateModified = "2019-06-01 01:46:34"
 sofa.GLOBAL_Title = ""
 sofa.GLOBAL_DatabaseName = ""
+sofa.GLOBAL_ListenerShortName = ""
 sofa.ListenerPosition_Type = "cartesian"
 sofa.ListenerPosition_Units = "metre"
 sofa.ListenerView_Type = "cartesian"
@@ -82,6 +80,7 @@ sofa.SourcePosition_Type = "spherical"
 sofa.SourcePosition_Units = "degree, degree, metre"
 sofa.EmitterPosition_Type = "cartesian"
 sofa.EmitterPosition_Units = "metre"
+sofa.Data_SamplingRate_Units = "hertz"
 
 # ----- Non-Mandatory attributes -----
 sofa.GLOBAL_ApplicationName = ""
@@ -90,8 +89,6 @@ sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_History = ""
 sofa.GLOBAL_References = ""
 sofa.GLOBAL_Origin = ""
-sofa.N_LongName = "frequency"
-sofa.N_Units = "hertz"
 
 
 """
@@ -99,9 +96,6 @@ sofa.N_Units = "hertz"
 """
 
 # ----- Mandatory double variables -----
-
-# Needs dimensions N
-sofa.N = np.zeros(1)
 
 # Needs dimensions IC or MC
 sofa.ListenerPosition = np.zeros(1)
@@ -122,10 +116,13 @@ sofa.SourcePosition = np.zeros(1)
 sofa.EmitterPosition = np.zeros(1)
 
 # Needs dimensions mRn
-sofa.Data_Real = np.zeros(1)
+sofa.Data_SOS = np.zeros(1)
 
-# Needs dimensions MRN
-sofa.Data_Imag = np.zeros(1)
+# Needs dimensions I
+sofa.Data_SamplingRate = np.zeros(1)
+
+# Needs dimensions IR or MR
+sofa.Data_Delay = np.zeros(1)
 
 # ----- Non-mandatory double variables -----
 

@@ -31,7 +31,7 @@
 #
 # =============================================================================
 #
-#                           File: GeneralTF.py
+#                           File: GeneralTF_1.0_1.0.py
 #                           Project: SOFASonix
 #                           Author: I.Laghidze
 #                           License: BSD 3
@@ -52,7 +52,6 @@ sofa = SOFAFile("GeneralTF", version=1.0, specVersion=1.0)
 sofa._M = 100
 sofa._N = 1024
 sofa._R = 2
-sofa._E = 4
 
 # View parameters of convention
 sofa.view()
@@ -68,8 +67,8 @@ sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "free field"
-sofa.GLOBAL_DateCreated = "2019-06-01 01:28:56"
-sofa.GLOBAL_DateModified = "2019-06-01 01:28:56"
+sofa.GLOBAL_DateCreated = "2019-06-01 01:46:34"
+sofa.GLOBAL_DateModified = "2019-06-01 01:46:34"
 sofa.GLOBAL_Title = ""
 sofa.N_Units = "hertz"
 sofa.ListenerPosition_Type = "cartesian"

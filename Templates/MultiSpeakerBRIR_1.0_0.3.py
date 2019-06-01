@@ -31,7 +31,7 @@
 #
 # =============================================================================
 #
-#                           File: GeneralFIRE.py
+#                           File: MultiSpeakerBRIR_1.0_0.3.py
 #                           Project: SOFASonix
 #                           Author: I.Laghidze
 #                           License: BSD 3
@@ -45,8 +45,8 @@ import numpy as np
 =============================== Initial Config ================================
 """
 
-# Create SOFAFile object with the latest GeneralFIRE convention
-sofa = SOFAFile("GeneralFIRE", version=1.0, specVersion=1.0)
+# Create SOFAFile object with the latest MultiSpeakerBRIR convention
+sofa = SOFAFile("MultiSpeakerBRIR", version=0.3, specVersion=1.0)
 
 # Set dimensions
 sofa._M = 100
@@ -67,12 +67,16 @@ sofa.GLOBAL_AuthorContact = ""
 sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
-sofa.GLOBAL_RoomType = "free field"
-sofa.GLOBAL_DateCreated = "2019-06-01 01:28:56"
-sofa.GLOBAL_DateModified = "2019-06-01 01:28:56"
+sofa.GLOBAL_RoomType = "reverberant"
+sofa.GLOBAL_DateCreated = "2019-06-01 01:46:34"
+sofa.GLOBAL_DateModified = "2019-06-01 01:46:34"
 sofa.GLOBAL_Title = ""
+sofa.GLOBAL_DatabaseName = ""
+sofa.GLOBAL_ListenerShortName = ""
 sofa.ListenerPosition_Type = "cartesian"
 sofa.ListenerPosition_Units = "metre"
+sofa.ListenerView_Type = "cartesian"
+sofa.ListenerView_Units = "metre"
 sofa.ReceiverPosition_Type = "cartesian"
 sofa.ReceiverPosition_Units = "metre"
 sofa.SourcePosition_Type = "spherical"
@@ -87,6 +91,9 @@ sofa.GLOBAL_ApplicationVersion = ""
 sofa.GLOBAL_History = ""
 sofa.GLOBAL_References = ""
 sofa.GLOBAL_Origin = ""
+sofa.GLOBAL_RoomDescription = ""
+sofa.EmitterView_Type = "cartesian"
+sofa.EmitterView_Units = "metre"
 
 
 """
@@ -97,6 +104,12 @@ sofa.GLOBAL_Origin = ""
 
 # Needs dimensions IC or MC
 sofa.ListenerPosition = np.zeros(1)
+
+# Needs dimensions IC or MC
+sofa.ListenerUp = np.zeros(1)
+
+# Needs dimensions IC or MC
+sofa.ListenerView = np.zeros(1)
 
 # Needs dimensions rCI or rCM
 sofa.ReceiverPosition = np.zeros(1)
@@ -117,6 +130,12 @@ sofa.Data_SamplingRate = np.zeros(1)
 sofa.Data_Delay = np.zeros(1)
 
 # ----- Non-mandatory double variables -----
+
+# Needs dimensions ECI or ECM
+sofa.EmitterUp = np.zeros(1)
+
+# Needs dimensions ECI or ECM
+sofa.EmitterView = np.zeros(1)
 
 
 """

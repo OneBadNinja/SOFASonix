@@ -31,7 +31,7 @@
 #
 # =============================================================================
 #
-#                           File: SimpleFreeFieldHRIR.py
+#                           File: SingleRoomDRIR_1.0_0.3.py
 #                           Project: SOFASonix
 #                           Author: I.Laghidze
 #                           License: BSD 3
@@ -45,14 +45,13 @@ import numpy as np
 =============================== Initial Config ================================
 """
 
-# Create SOFAFile object with the latest SimpleFreeFieldHRIR convention
-sofa = SOFAFile("SimpleFreeFieldHRIR", version=1.0, specVersion=1.0)
+# Create SOFAFile object with the latest SingleRoomDRIR convention
+sofa = SOFAFile("SingleRoomDRIR", version=0.3, specVersion=1.0)
 
 # Set dimensions
 sofa._M = 100
 sofa._N = 1024
 sofa._R = 2
-sofa._E = 4
 
 # View parameters of convention
 sofa.view()
@@ -64,22 +63,23 @@ sofa.view()
 
 # ----- Mandatory attributes -----
 sofa.GLOBAL_AuthorContact = ""
+sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
-sofa.GLOBAL_RoomType = "free field"
-sofa.GLOBAL_DateCreated = "2019-06-01 01:28:56"
-sofa.GLOBAL_DateModified = "2019-06-01 01:28:56"
+sofa.GLOBAL_RoomType = "reverberant"
+sofa.GLOBAL_DateCreated = "2019-06-01 01:46:34"
+sofa.GLOBAL_DateModified = "2019-06-01 01:46:34"
 sofa.GLOBAL_Title = ""
 sofa.GLOBAL_DatabaseName = ""
-sofa.GLOBAL_ListenerShortName = ""
+sofa.GLOBAL_RoomDescription = ""
 sofa.ListenerPosition_Type = "cartesian"
 sofa.ListenerPosition_Units = "metre"
 sofa.ListenerView_Type = "cartesian"
-sofa.ListenerView_Units = "metre"
 sofa.ReceiverPosition_Type = "cartesian"
 sofa.ReceiverPosition_Units = "metre"
-sofa.SourcePosition_Type = "spherical"
-sofa.SourcePosition_Units = "degree, degree, metre"
+sofa.SourcePosition_Type = "cartesian"
+sofa.SourcePosition_Units = "metre"
+sofa.SourceView_Type = "cartesian"
 sofa.EmitterPosition_Type = "cartesian"
 sofa.EmitterPosition_Units = "metre"
 sofa.Data_SamplingRate_Units = "hertz"
@@ -87,7 +87,6 @@ sofa.Data_SamplingRate_Units = "hertz"
 # ----- Non-Mandatory attributes -----
 sofa.GLOBAL_ApplicationName = ""
 sofa.GLOBAL_ApplicationVersion = ""
-sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_History = ""
 sofa.GLOBAL_References = ""
 sofa.GLOBAL_Origin = ""
@@ -113,6 +112,12 @@ sofa.ReceiverPosition = np.zeros(1)
 
 # Needs dimensions IC or MC
 sofa.SourcePosition = np.zeros(1)
+
+# Needs dimensions IC or MC
+sofa.SourceUp = np.zeros(1)
+
+# Needs dimensions IC or MC
+sofa.SourceView = np.zeros(1)
 
 # Needs dimensions eCI or eCM
 sofa.EmitterPosition = np.zeros(1)

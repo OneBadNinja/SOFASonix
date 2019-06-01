@@ -31,7 +31,7 @@
 #
 # =============================================================================
 #
-#                           File: MultiSpeakerBRIR.py
+#                           File: SimpleFreeFieldHRIR_1.0_1.0.py
 #                           Project: SOFASonix
 #                           Author: I.Laghidze
 #                           License: BSD 3
@@ -45,14 +45,12 @@ import numpy as np
 =============================== Initial Config ================================
 """
 
-# Create SOFAFile object with the latest MultiSpeakerBRIR convention
-sofa = SOFAFile("MultiSpeakerBRIR", version=0.3, specVersion=1.0)
+# Create SOFAFile object with the latest SimpleFreeFieldHRIR convention
+sofa = SOFAFile("SimpleFreeFieldHRIR", version=1.0, specVersion=1.0)
 
 # Set dimensions
 sofa._M = 100
 sofa._N = 1024
-sofa._R = 2
-sofa._E = 4
 
 # View parameters of convention
 sofa.view()
@@ -64,12 +62,11 @@ sofa.view()
 
 # ----- Mandatory attributes -----
 sofa.GLOBAL_AuthorContact = ""
-sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
-sofa.GLOBAL_RoomType = "reverberant"
-sofa.GLOBAL_DateCreated = "2019-06-01 01:28:56"
-sofa.GLOBAL_DateModified = "2019-06-01 01:28:56"
+sofa.GLOBAL_RoomType = "free field"
+sofa.GLOBAL_DateCreated = "2019-06-01 01:46:34"
+sofa.GLOBAL_DateModified = "2019-06-01 01:46:34"
 sofa.GLOBAL_Title = ""
 sofa.GLOBAL_DatabaseName = ""
 sofa.GLOBAL_ListenerShortName = ""
@@ -88,12 +85,10 @@ sofa.Data_SamplingRate_Units = "hertz"
 # ----- Non-Mandatory attributes -----
 sofa.GLOBAL_ApplicationName = ""
 sofa.GLOBAL_ApplicationVersion = ""
+sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_History = ""
 sofa.GLOBAL_References = ""
 sofa.GLOBAL_Origin = ""
-sofa.GLOBAL_RoomDescription = ""
-sofa.EmitterView_Type = "cartesian"
-sofa.EmitterView_Units = "metre"
 
 
 """
@@ -120,22 +115,16 @@ sofa.SourcePosition = np.zeros(1)
 # Needs dimensions eCI or eCM
 sofa.EmitterPosition = np.zeros(1)
 
-# Needs dimensions mREn
+# Needs dimensions mRn
 sofa.Data_IR = np.zeros(1)
 
 # Needs dimensions I
 sofa.Data_SamplingRate = np.zeros(1)
 
-# Needs dimensions IRE or MRE
+# Needs dimensions IR or MR
 sofa.Data_Delay = np.zeros(1)
 
 # ----- Non-mandatory double variables -----
-
-# Needs dimensions ECI or ECM
-sofa.EmitterUp = np.zeros(1)
-
-# Needs dimensions ECI or ECM
-sofa.EmitterView = np.zeros(1)
 
 
 """

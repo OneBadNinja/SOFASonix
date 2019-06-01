@@ -31,7 +31,7 @@
 #
 # =============================================================================
 #
-#                           File: MusicalInstrumentDirectivity.py
+#                           File: GeneralFIRE_1.0_1.0.py
 #                           Project: SOFASonix
 #                           Author: I.Laghidze
 #                           License: BSD 3
@@ -45,8 +45,8 @@ import numpy as np
 =============================== Initial Config ================================
 """
 
-# Create SOFAFile object with the latest MusicalInstrumentDirectivity convention
-sofa = SOFAFile("MusicalInstrumentDirectivity", version=1.0, specVersion=1.0)
+# Create SOFAFile object with the latest GeneralFIRE convention
+sofa = SOFAFile("GeneralFIRE", version=1.0, specVersion=1.0)
 
 # Set dimensions
 sofa._M = 100
@@ -68,30 +68,18 @@ sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "free field"
-sofa.GLOBAL_DateCreated = "2019-06-01 01:28:56"
-sofa.GLOBAL_DateModified = "2019-06-01 01:28:56"
+sofa.GLOBAL_DateCreated = "2019-06-01 01:46:34"
+sofa.GLOBAL_DateModified = "2019-06-01 01:46:34"
 sofa.GLOBAL_Title = ""
-sofa.GLOBAL_InstrumentType = ""
-sofa.GLOBAL_InstrumentManufacturer = ""
-sofa.GLOBAL_Musician = ""
-sofa.GLOBAL_MusicianPosition = ""
-sofa.N_LongName = "frequency"
-sofa.N_Units = "hertz"
 sofa.ListenerPosition_Type = "cartesian"
 sofa.ListenerPosition_Units = "metre"
 sofa.ReceiverPosition_Type = "cartesian"
 sofa.ReceiverPosition_Units = "metre"
 sofa.SourcePosition_Type = "spherical"
 sofa.SourcePosition_Units = "degree, degree, metre"
-sofa.SourcePosition_Definition = ""
-sofa.SourceView_Type = "spherical"
-sofa.SourceView_Units = "degree, degree, metre"
-sofa.SourceView_Definition = ""
-sofa.SourceUp_Type = "spherical"
-sofa.SourceUp_Units = "degree, degree, metre"
-sofa.SourceUp_Definition = ""
 sofa.EmitterPosition_Type = "cartesian"
-sofa.EmitterPosition_Units = "degree, degree, metre"
+sofa.EmitterPosition_Units = "metre"
+sofa.Data_SamplingRate_Units = "hertz"
 
 # ----- Non-Mandatory attributes -----
 sofa.GLOBAL_ApplicationName = ""
@@ -99,9 +87,6 @@ sofa.GLOBAL_ApplicationVersion = ""
 sofa.GLOBAL_History = ""
 sofa.GLOBAL_References = ""
 sofa.GLOBAL_Origin = ""
-sofa.EmitterDescription = "cartesian"
-sofa.TuningFrequency_LongName = "frequency"
-sofa.TuningFrequency_Units = "hertz"
 
 
 """
@@ -110,40 +95,28 @@ sofa.TuningFrequency_Units = "hertz"
 
 # ----- Mandatory double variables -----
 
-# Needs dimensions N or NE
-sofa.N = np.zeros(1)
-
-# Needs dimensions IC
+# Needs dimensions IC or MC
 sofa.ListenerPosition = np.zeros(1)
 
-# Needs dimensions rCI
+# Needs dimensions rCI or rCM
 sofa.ReceiverPosition = np.zeros(1)
 
-# Needs dimensions IC
+# Needs dimensions IC or MC
 sofa.SourcePosition = np.zeros(1)
 
-# Needs dimensions IC
-sofa.SourceView = np.zeros(1)
-
-# Needs dimensions IC
-sofa.SourceUp = np.zeros(1)
-
-# Needs dimensions eCI
+# Needs dimensions eCI or eCM
 sofa.EmitterPosition = np.zeros(1)
 
 # Needs dimensions mREn
-sofa.Data_Real = np.zeros(1)
+sofa.Data_IR = np.zeros(1)
 
-# Needs dimensions MREN
-sofa.Data_Imag = np.zeros(1)
+# Needs dimensions I
+sofa.Data_SamplingRate = np.zeros(1)
+
+# Needs dimensions IRE or MRE
+sofa.Data_Delay = np.zeros(1)
 
 # ----- Non-mandatory double variables -----
-
-# Needs dimensions E
-sofa.EmitterMidiNote = np.zeros(1)
-
-# Needs dimensions I or E
-sofa.TuningFrequency = np.zeros(1)
 
 
 """

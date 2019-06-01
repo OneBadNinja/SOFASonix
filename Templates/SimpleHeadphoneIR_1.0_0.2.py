@@ -31,7 +31,7 @@
 #
 # =============================================================================
 #
-#                           File: SimpleHeadphoneIR.py
+#                           File: SimpleHeadphoneIR_1.0_0.2.py
 #                           Project: SOFASonix
 #                           Author: I.Laghidze
 #                           License: BSD 3
@@ -51,8 +51,6 @@ sofa = SOFAFile("SimpleHeadphoneIR", version=0.2, specVersion=1.0)
 # Set dimensions
 sofa._M = 100
 sofa._N = 1024
-sofa._R = 2
-sofa._E = 4
 
 # View parameters of convention
 sofa.view()
@@ -68,8 +66,8 @@ sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "free field"
-sofa.GLOBAL_DateCreated = "2019-06-01 01:28:56"
-sofa.GLOBAL_DateModified = "2019-06-01 01:28:56"
+sofa.GLOBAL_DateCreated = "2019-06-01 01:46:34"
+sofa.GLOBAL_DateModified = "2019-06-01 01:46:34"
 sofa.GLOBAL_Title = ""
 sofa.GLOBAL_DatabaseName = ""
 sofa.GLOBAL_ListenerShortName = ""
