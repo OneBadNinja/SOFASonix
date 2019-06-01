@@ -68,8 +68,8 @@ sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "free field"
-sofa.GLOBAL_DateCreated = "2019-06-01 01:46:34"
-sofa.GLOBAL_DateModified = "2019-06-01 01:46:34"
+sofa.GLOBAL_DateCreated = "2019-06-01 19:38:27"
+sofa.GLOBAL_DateModified = "2019-06-01 19:38:27"
 sofa.GLOBAL_Title = ""
 sofa.GLOBAL_InstrumentType = ""
 sofa.GLOBAL_InstrumentManufacturer = ""
@@ -97,12 +97,12 @@ sofa.N_LongName = "frequency"
 sofa.N_Units = "Hertz"
 
 # ----- Non-Mandatory attributes -----
-sofa.GLOBAL_ApplicationName = ""
-sofa.GLOBAL_ApplicationVersion = ""
-sofa.GLOBAL_History = ""
-sofa.GLOBAL_References = ""
-sofa.GLOBAL_Origin = ""
-sofa.MIDINoteDescription = ""
+sofa.GLOBAL_ApplicationName = None
+sofa.GLOBAL_ApplicationVersion = None
+sofa.GLOBAL_History = None
+sofa.GLOBAL_References = None
+sofa.GLOBAL_Origin = None
+sofa.MIDINoteDescription = None
 
 
 """
@@ -147,10 +147,10 @@ sofa.Data_Imag = np.zeros(1)
 # ----- Non-mandatory double variables -----
 
 # Needs dimensions I or M
-sofa.MIDINote = np.zeros(1)
+sofa.MIDINote = None
 
 # Needs dimensions I or M
-sofa.TuningFrequency = np.zeros(1)
+sofa.TuningFrequency = None
 
 
 """

@@ -68,8 +68,8 @@ sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "reverberant"
-sofa.GLOBAL_DateCreated = "2019-06-01 01:46:34"
-sofa.GLOBAL_DateModified = "2019-06-01 01:46:34"
+sofa.GLOBAL_DateCreated = "2019-06-01 19:38:27"
+sofa.GLOBAL_DateModified = "2019-06-01 19:38:27"
 sofa.GLOBAL_Title = ""
 sofa.GLOBAL_DatabaseName = ""
 sofa.GLOBAL_ListenerShortName = ""
@@ -86,14 +86,14 @@ sofa.EmitterPosition_Units = "metre"
 sofa.Data_SamplingRate_Units = "hertz"
 
 # ----- Non-Mandatory attributes -----
-sofa.GLOBAL_ApplicationName = ""
-sofa.GLOBAL_ApplicationVersion = ""
-sofa.GLOBAL_History = ""
-sofa.GLOBAL_References = ""
-sofa.GLOBAL_Origin = ""
-sofa.GLOBAL_RoomDescription = ""
-sofa.EmitterView_Type = "cartesian"
-sofa.EmitterView_Units = "metre"
+sofa.GLOBAL_ApplicationName = None
+sofa.GLOBAL_ApplicationVersion = None
+sofa.GLOBAL_History = None
+sofa.GLOBAL_References = None
+sofa.GLOBAL_Origin = None
+sofa.GLOBAL_RoomDescription = None
+sofa.EmitterView_Type = None
+sofa.EmitterView_Units = None
 
 
 """
@@ -132,10 +132,10 @@ sofa.Data_Delay = np.zeros(1)
 # ----- Non-mandatory double variables -----
 
 # Needs dimensions ECI or ECM
-sofa.EmitterUp = np.zeros(1)
+sofa.EmitterUp = None
 
 # Needs dimensions ECI or ECM
-sofa.EmitterView = np.zeros(1)
+sofa.EmitterView = None
 
 
 """

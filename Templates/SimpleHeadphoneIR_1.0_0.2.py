@@ -66,8 +66,8 @@ sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "free field"
-sofa.GLOBAL_DateCreated = "2019-06-01 01:46:34"
-sofa.GLOBAL_DateModified = "2019-06-01 01:46:34"
+sofa.GLOBAL_DateCreated = "2019-06-01 19:38:27"
+sofa.GLOBAL_DateModified = "2019-06-01 19:38:27"
 sofa.GLOBAL_Title = ""
 sofa.GLOBAL_DatabaseName = ""
 sofa.GLOBAL_ListenerShortName = ""
@@ -89,11 +89,11 @@ sofa.EmitterPosition_Units = "metre"
 sofa.Data_SamplingRate_Units = "hertz"
 
 # ----- Non-Mandatory attributes -----
-sofa.GLOBAL_ApplicationName = ""
-sofa.GLOBAL_ApplicationVersion = ""
-sofa.GLOBAL_History = ""
-sofa.GLOBAL_References = ""
-sofa.GLOBAL_Origin = ""
+sofa.GLOBAL_ApplicationName = None
+sofa.GLOBAL_ApplicationVersion = None
+sofa.GLOBAL_History = None
+sofa.GLOBAL_References = None
+sofa.GLOBAL_Origin = None
 
 
 """
@@ -105,16 +105,16 @@ sofa.GLOBAL_Origin = ""
 # ----- Non-mandatory string variables -----
 
 # Needs dimensions MS
-sofa.ReceiverDescription = np.zeros(1)
+sofa.ReceiverDescription = None
 
 # Needs dimensions MS
-sofa.SourceManufacturer = np.zeros(1)
+sofa.SourceManufacturer = None
 
 # Needs dimensions MS
-sofa.SourceModel = np.zeros(1)
+sofa.SourceModel = None
 
 # Needs dimensions MS
-sofa.EmitterDescription = np.zeros(1)
+sofa.EmitterDescription = None
 
 
 """
@@ -147,7 +147,7 @@ sofa.Data_Delay = np.zeros(1)
 # ----- Non-mandatory double variables -----
 
 # Needs dimensions M
-sofa.MeasurementDate = np.zeros(1)
+sofa.MeasurementDate = None
 
 
 """

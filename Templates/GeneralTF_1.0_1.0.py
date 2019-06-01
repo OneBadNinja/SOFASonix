@@ -67,8 +67,8 @@ sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "free field"
-sofa.GLOBAL_DateCreated = "2019-06-01 01:46:34"
-sofa.GLOBAL_DateModified = "2019-06-01 01:46:34"
+sofa.GLOBAL_DateCreated = "2019-06-01 19:38:27"
+sofa.GLOBAL_DateModified = "2019-06-01 19:38:27"
 sofa.GLOBAL_Title = ""
 sofa.N_Units = "hertz"
 sofa.ListenerPosition_Type = "cartesian"
@@ -81,12 +81,12 @@ sofa.EmitterPosition_Type = "cartesian"
 sofa.EmitterPosition_Units = "metre"
 
 # ----- Non-Mandatory attributes -----
-sofa.GLOBAL_ApplicationName = ""
-sofa.GLOBAL_ApplicationVersion = ""
-sofa.GLOBAL_History = ""
-sofa.GLOBAL_References = ""
-sofa.GLOBAL_Origin = ""
-sofa.N_LongName = "frequency"
+sofa.GLOBAL_ApplicationName = None
+sofa.GLOBAL_ApplicationVersion = None
+sofa.GLOBAL_History = None
+sofa.GLOBAL_References = None
+sofa.GLOBAL_Origin = None
+sofa.N_LongName = None
 
 
 """

@@ -4,9 +4,12 @@ from .SOFASonix import SOFASonix
 def SOFATemplate(convention,
                  version=False,
                  specVersion=False,
-                 path=False):
+                 path=False,
+                 useNone=True,
+                 testMode=False):
     # Create SOFAFile
     sofa = SOFASonix(convention, version, specVersion)
+    convention = sofa.global_sofaconventions
 
     # Obtain parameters and sort by attributes, doubles and strings
     attributes = sofa.flatten()
@@ -111,19 +114,29 @@ sofa.view()
             if(ai.value):
                 file.write("sofa.{} = \"{}\"".format(ai.getShorthandName(),
                            ai.value))
-            else:   
-                file.write("sofa.{} = \"\"".format(ai.getShorthandName()))
+            else:
+                if(testMode):
+                    file.write("sofa.{} = \"TestMode\"".format(ai.getShorthandName()))
+                else:
+                    file.write("sofa.{} = \"\"".format(ai.getShorthandName()))
             file.write("\n")
 
     # Generate non-mandatory attributes
     file.write("\n# ----- Non-Mandatory attributes -----\n")
     for key, ai in attributes.items():
         if(not ai.isReadOnly() and not ai.isRequired()):
-            if(ai.value):
-                file.write("sofa.{} = \"{}\"".format(ai.getShorthandName(),
+            if(useNone):
+                file.write("sofa.{} = None".format(ai.getShorthandName(),
                            ai.value))
-            else:   
-                file.write("sofa.{} = \"\"".format(ai.getShorthandName()))
+            else:
+                if(ai.value):
+                    file.write("sofa.{} = \"{}\"".format(ai.getShorthandName(),
+                               ai.value))
+                else:   
+                    if(testMode):
+                        file.write("sofa.{} = \"TestMode\"".format(ai.getShorthandName()))
+                    else:
+                        file.write("sofa.{} = \"\"".format(ai.getShorthandName()))
             file.write("\n")
 
     if(strings):
@@ -137,7 +150,11 @@ sofa.view()
         for key, si in strings.items():
             if(not si.isReadOnly() and si.isRequired()): 
                 file.write("\n# Needs dimensions {}\n".format(" or ".join(si.dimensions)))
-                file.write("sofa.{} = np.zeros(1)".format(si.getShorthandName()))
+                if(testMode):
+                    dims = ", ".join(["sofa._{}".format(i) for i in si.dimensions[0]])
+                    file.write("sofa.{} = np.zeros(({}))".format(si.getShorthandName(), dims))
+                else:
+                    file.write("sofa.{} = np.zeros(1)".format(si.getShorthandName()))
                 file.write("\n")
 
         # Generate non-mandatory strings
@@ -145,7 +162,14 @@ sofa.view()
         for key, si in strings.items():
             if(not si.isReadOnly() and not si.isRequired()):
                 file.write("\n# Needs dimensions {}\n".format(" or ".join(si.dimensions)))
-                file.write("sofa.{} = np.zeros(1)".format(si.getShorthandName()))
+                if(useNone):
+                    file.write("sofa.{} = None".format(si.getShorthandName()))
+                else:
+                    if(testMode):
+                        dims = ", ".join(["sofa._{}".format(i) for i in si.dimensions[0]])
+                        file.write("sofa.{} = np.zeros(({}))".format(si.getShorthandName(), dims))
+                    else:
+                        file.write("sofa.{} = np.zeros(1)".format(si.getShorthandName()))
                 file.write("\n")
 
     # Create doubles separator
@@ -158,7 +182,11 @@ sofa.view()
     for key, di in doubles.items():
         if(not di.isReadOnly() and di.isRequired()):
             file.write("\n# Needs dimensions {}\n".format(" or ".join(di.dimensions)))
-            file.write("sofa.{} = np.zeros(1)".format(di.getShorthandName()))
+            if(testMode):
+                dims = ", ".join(["sofa._{}".format(i) for i in di.dimensions[0]])
+                file.write("sofa.{} = np.zeros(({}))".format(di.getShorthandName(), dims))
+            else:
+                file.write("sofa.{} = np.zeros(1)".format(di.getShorthandName()))
             file.write("\n")
 
     # Generate non-mandatory doubles
@@ -166,7 +194,14 @@ sofa.view()
     for key, di in doubles.items():
         if(not di.isReadOnly() and not di.isRequired()):
             file.write("\n# Needs dimensions {}\n".format(" or ".join(di.dimensions)))
-            file.write("sofa.{} = np.zeros(1)".format(di.getShorthandName()))
+            if(useNone):
+                file.write("sofa.{} = None".format(di.getShorthandName()))
+            else:
+                if(testMode):
+                    dims = ", ".join(["sofa._{}".format(i) for i in di.dimensions[0]])
+                    file.write("sofa.{} = np.zeros(({}))".format(di.getShorthandName(), dims))
+                else:
+                    file.write("sofa.{} = np.zeros(1)".format(di.getShorthandName()))
             file.write("\n")
 
     # Create export separator
