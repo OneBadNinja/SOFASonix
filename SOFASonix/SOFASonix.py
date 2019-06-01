@@ -540,7 +540,12 @@ class SOFASonix(object):
                                     print(("Setting dimension '{}' from "
                                            "parameter '{}'"
                                            ).format(dim, param.name))
-                                    self.setDim(dim, value.shape[i])
+                                    # Bypass any exceptions if dim is RO
+                                    try:
+                                        self.setDim(dim, value.shape[i],
+                                                    force=force)
+                                    except Exception:
+                                        pass
                         else:
                             raise SOFAFieldError(("Parameter '{}' of type "
                                                   "'double' cannot contain "
