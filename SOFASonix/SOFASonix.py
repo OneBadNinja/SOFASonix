@@ -85,10 +85,14 @@ class SOFASonix(object):
 
         # Check if creating new SOFA file or loading an existing one
         if(load is False):
-            # Date timestamps
-            self.getParam("GLOBAL:DateCreated", True).value = self._time()
-            # Date modified - Updated on SAVE
-            self.getParam("GLOBAL:DateModified", True).value = self._time()
+            # Attempt to automatically fill date fields if they exist
+            try:
+                # Date timestamps
+                self.getParam("GLOBAL:DateCreated", True).value = self._time()
+                # Date modified - Updated on SAVE
+                self.getParam("GLOBAL:DateModified", True).value = self._time()
+            except SOFAFieldError:
+                pass
 
     def __setattr__(self, name, value):
         # Quick set dimensions if supplied.
@@ -629,8 +633,11 @@ class SOFASonix(object):
         for category in self.params:
             self.validate(category)
 
-        # Set new DateModified value
-        self.getParam("GLOBAL:DateModified", True).value = self._time()
+        # Set new DateModified value if it exists
+        try:
+            self.getParam("GLOBAL:DateModified", True).value = self._time()
+        except SOFAFieldError:
+            pass
 
         # Create file and attempt saving.
         file = netCDF4.Dataset("{}.sofa".format(filename), "w",
