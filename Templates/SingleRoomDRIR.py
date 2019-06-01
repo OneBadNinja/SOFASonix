@@ -31,7 +31,7 @@
 #
 # =============================================================================
 #
-#                           File: Templates/SingleRoomDRIR.py
+#                           File: SingleRoomDRIR.py
 #                           Project: SOFASonix
 #                           Author: I.Laghidze
 #                           License: BSD 3
@@ -46,7 +46,7 @@ import numpy as np
 """
 
 # Create SOFAFile object with the latest SingleRoomDRIR convention
-sofa = SOFAFile("SingleRoomDRIR")
+sofa = SOFAFile("SingleRoomDRIR", version=0.3, specVersion=1.0)
 
 # Set dimensions
 sofa._M = 100
@@ -68,8 +68,8 @@ sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "reverberant"
-sofa.GLOBAL_DateCreated = "2019-05-31 18:53:04"
-sofa.GLOBAL_DateModified = "2019-05-31 18:53:04"
+sofa.GLOBAL_DateCreated = "2019-06-01 01:28:56"
+sofa.GLOBAL_DateModified = "2019-06-01 01:28:56"
 sofa.GLOBAL_Title = ""
 sofa.GLOBAL_DatabaseName = ""
 sofa.GLOBAL_RoomDescription = ""
