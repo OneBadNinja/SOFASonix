@@ -46,7 +46,7 @@ import numpy as np
 """
 
 # Create SOFAFile object with the latest GeneralFIR convention
-sofa = SOFAFile("GeneralFIR", version=1.0, specVersion=1.0)
+sofa = SOFAFile("GeneralFIR", sofaConventionsVersion=1.0, version=1.0)
 
 # Set dimensions
 sofa._M = 100
@@ -67,8 +67,8 @@ sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "free field"
-sofa.GLOBAL_DateCreated = "2019-06-01 19:38:27"
-sofa.GLOBAL_DateModified = "2019-06-01 19:38:27"
+sofa.GLOBAL_DateCreated = "2019-06-07 20:32:04"
+sofa.GLOBAL_DateModified = "2019-06-07 20:32:04"
 sofa.GLOBAL_Title = ""
 sofa.ListenerPosition_Type = "cartesian"
 sofa.ListenerPosition_Units = "metre"

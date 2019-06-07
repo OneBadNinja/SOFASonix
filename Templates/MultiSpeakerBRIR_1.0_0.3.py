@@ -46,7 +46,7 @@ import numpy as np
 """
 
 # Create SOFAFile object with the latest MultiSpeakerBRIR convention
-sofa = SOFAFile("MultiSpeakerBRIR", version=0.3, specVersion=1.0)
+sofa = SOFAFile("MultiSpeakerBRIR", sofaConventionsVersion=0.3, version=1.0)
 
 # Set dimensions
 sofa._M = 100
@@ -68,8 +68,8 @@ sofa.GLOBAL_Comment = ""
 sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "reverberant"
-sofa.GLOBAL_DateCreated = "2019-06-01 19:38:27"
-sofa.GLOBAL_DateModified = "2019-06-01 19:38:27"
+sofa.GLOBAL_DateCreated = "2019-06-07 20:32:05"
+sofa.GLOBAL_DateModified = "2019-06-07 20:32:05"
 sofa.GLOBAL_Title = ""
 sofa.GLOBAL_DatabaseName = ""
 sofa.GLOBAL_ListenerShortName = ""

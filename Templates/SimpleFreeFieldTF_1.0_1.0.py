@@ -46,7 +46,7 @@ import numpy as np
 """
 
 # Create SOFAFile object with the latest SimpleFreeFieldTF convention
-sofa = SOFAFile("SimpleFreeFieldTF", version=1.0, specVersion=1.0)
+sofa = SOFAFile("SimpleFreeFieldTF", sofaConventionsVersion=1.0, version=1.0)
 
 # Set dimensions
 sofa._M = 100
@@ -66,8 +66,8 @@ sofa.GLOBAL_License = "No license provided, ask the author for permission"
 sofa.GLOBAL_ListenerShortName = ""
 sofa.GLOBAL_Organization = ""
 sofa.GLOBAL_RoomType = "free field"
-sofa.GLOBAL_DateCreated = "2019-06-01 19:38:27"
-sofa.GLOBAL_DateModified = "2019-06-01 19:38:27"
+sofa.GLOBAL_DateCreated = "2019-06-07 20:32:05"
+sofa.GLOBAL_DateModified = "2019-06-07 20:32:05"
 sofa.GLOBAL_Title = ""
 sofa.GLOBAL_DatabaseName = ""
 sofa.ListenerPosition_Type = "cartesian"
