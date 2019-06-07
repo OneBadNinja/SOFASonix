@@ -2,13 +2,13 @@ from .SOFASonix import SOFASonix
 
 
 def SOFATemplate(convention,
+                 sofaConventionsVersion=False,
                  version=False,
-                 specVersion=False,
                  path=False,
                  useNone=True,
                  testMode=False):
     # Create SOFAFile
-    sofa = SOFASonix(convention, version, specVersion)
+    sofa = SOFASonix(convention, sofaConventionsVersion, version)
     convention = sofa.global_sofaconventions
 
     # Obtain parameters and sort by attributes, doubles and strings
@@ -82,7 +82,7 @@ import numpy as np
 \"""
 
 # Create SOFAFile object with the latest {} convention
-sofa = SOFAFile("{}", version={}, specVersion={})
+sofa = SOFAFile("{}", sofaConventionsVersion={}, version={})
 """.format(convention, convention,
            sofa.GLOBAL_SOFAConventionsVersion, sofa.GLOBAL_Version)
 

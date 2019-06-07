@@ -51,10 +51,13 @@ from .SOFASonixError import SOFAError, SOFAFieldError
 
 class SOFASonix(object):
     APIName = "SOFASonix"
-    APIVersion = "1.0.5"
+    APIVersion = "1.0.6"
     DBFile = "ss_db.db"
 
-    def __init__(self, conv, version=False, specVersion=False, load=False,
+    def __init__(self, conv,
+                 sofaConventionsVersion=False,
+                 version=False,
+                 load=False,
                  **dims):
         # Create DB Path
         try:
@@ -65,7 +68,8 @@ class SOFASonix(object):
             self.dbpath = "{}/{}".format(cwdpath, SOFASonix.DBFile)
 
         # Return convention data if valid params supplied.
-        self.convention = self._getConvention(conv, version, specVersion)
+        self.convention = self._getConvention(conv, sofaConventionsVersion,
+                                              version)
         self.modified = False  # Check whether convention has been modified
 
         # Get dimensions
@@ -174,7 +178,8 @@ class SOFASonix(object):
                                                             amountToPad,
                                                             'constant')
 
-    def _getConvention(self, conv, version, specVersion):
+    def _getConvention(self, conv, sofaConventionsVersion,
+                       version):
         conventionData = self._getData("""SELECT convention_names.name as name,
                                                  conventions.id,
                                                  version,
@@ -200,18 +205,18 @@ class SOFASonix(object):
         # If supplied convention is in the database, check versions.
         if(conventionData):
             conventionName = conventionData[0][0]
-            if(version and specVersion):
+            if(sofaConventionsVersion and version):
                 try:
                     convention = conventionData[np.argwhere(
                             np.array([i[2] + i[3] for i in conventionData])
-                            == version + specVersion)[0][0]]
+                            == sofaConventionsVersion + version)[0][0]]
                 except Exception:
-                    raise SOFAError(("Incompatible convention version ({}) "
-                                     "and spec version ({}) supplied. The "
+                    raise SOFAError(("Incompatible SOFAConventionsVersion ({})"
+                                     " and spec version ({}) supplied. The "
                                      "following pairs are available for "
                                      "'{}':\n\n{}"
-                                     ).format(version,
-                                              specVersion,
+                                     ).format(sofaConventionsVersion,
+                                              version,
                                               conventionName,
                                               "\n".join([("- Version: {}"
                                                           ", Spec Version: "
@@ -219,12 +224,13 @@ class SOFASonix(object):
                                                                        i[3])
                                                          for i in
                                                          conventionData])))
-            elif(version):
+            elif(sofaConventionsVersion):
                 try:
                     # Retrieve row indices with the supplied convention version
                     versionIndices = np.argwhere(np.array([i[2] for i in
                                                            conventionData])
-                                                 == version)[:, 0]
+                                                 == sofaConventionsVersion
+                                                 )[:, 0]
 
                     # Strip invalid convention entries
                     validConventionData = [conventionData[i] for i
@@ -237,19 +243,19 @@ class SOFASonix(object):
                 except Exception:
                     available = np.unique([i[2] for i
                                            in conventionData]).astype(str)
-                    raise SOFAError("Invalid convention version ({}). The "
-                                    "following convention versions are "
-                                    "available for '{}':\n\n- {}".format(
-                                            version,
+                    raise SOFAError("Invalid SOFAConventionsVersion ({}). The "
+                                    "following SOFAConventionsVersion values "
+                                    "are available for '{}':\n\n- {}".format(
+                                            sofaConventionsVersion,
                                             conventionName,
                                             "\n- ".join(available)))
 
-            elif(specVersion):
+            elif(version):
                 try:
                     # Retrieve row indices with the supplied convention version
                     specVersionIndices = np.argwhere(np.array([i[3] for i in
                                                                conventionData])
-                                                     == specVersion)[:, 0]
+                                                     == version)[:, 0]
 
                     # Strip invalid convention entries
                     validConventionData = [conventionData[i] for i
@@ -265,7 +271,7 @@ class SOFASonix(object):
                     raise SOFAError("Invalid spec version ({}). The following"
                                     " spec versions are available for "
                                     "'{}':\n\n- {}".format(
-                                            specVersion,
+                                            version,
                                             conventionName,
                                             "\n- ".join(available)))
             else:
@@ -281,7 +287,8 @@ class SOFASonix(object):
                              "Please supply one of the following "
                              "conventions:\n\n- {}"
                              ).format(conv, "\n- ".join(conventions)))
-        keys = ["name", "id", "version", "spec_version", "standard",
+        keys = ["name", "id", "SOFAConventionsVersion", "spec_version",
+                "standard",
                 "dimensions", "data_group"]
         return dict(zip(keys, convention))
 
