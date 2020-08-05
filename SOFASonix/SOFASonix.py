@@ -434,6 +434,7 @@ class SOFASonix(object):
 
         # Close h5py file and return SOFASonix object
         raw.close()
+        del raw
         return sofa
 
     def getDim(self, dim):
