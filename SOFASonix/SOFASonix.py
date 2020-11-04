@@ -45,6 +45,7 @@ import sqlite3
 import pandas as pd
 import datetime
 import os
+import gc
 from .SOFASonixField import SOFASonixField
 from .SOFASonixError import SOFAError, SOFAFieldError
 
@@ -376,6 +377,7 @@ class SOFASonix(object):
 
     @staticmethod
     def load(file):
+        gc.collect()
         raw = netCDF4.Dataset(file, "r", "NETCDF4")
         # Try to find a convention
         try:
@@ -434,6 +436,7 @@ class SOFASonix(object):
 
         # Close h5py file and return SOFASonix object
         raw.close()
+        del raw
         return sofa
 
     def getDim(self, dim):
