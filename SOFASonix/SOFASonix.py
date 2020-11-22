@@ -52,14 +52,18 @@ from .SOFASonixError import SOFAError, SOFAFieldError
 
 class SOFASonix(object):
     APIName = "SOFASonix"
-    APIVersion = "1.0.6"
+    API_VERSION_MAJOR = 1
+    API_VERSION_MINOR = 0
+    API_VERSION_PATCH = 7
     DBFile = "ss_db.db"
 
     def __init__(self, conv,
                  sofaConventionsVersion=False,
                  version=False,
                  load=False,
+                 verbose=True,
                  **dims):
+
         # Create DB Path
         try:
             cwdpath = os.path.dirname(os.path.realpath(__file__))
@@ -67,6 +71,9 @@ class SOFASonix(object):
             cwdpath = os.path.dirname(os.path.realpath('__file__'))
         finally:
             self.dbpath = "{}/{}".format(cwdpath, SOFASonix.DBFile)
+
+        # Set verbose
+        self.verbose = True if verbose else False
 
         # Return convention data if valid params supplied.
         self.convention = self._getConvention(conv, sofaConventionsVersion,
@@ -86,7 +93,7 @@ class SOFASonix(object):
         self.getParam("GLOBAL:APIName",
                       True).value = SOFASonix.APIName
         self.getParam("GLOBAL:APIVersion",
-                      True).value = SOFASonix.APIVersion
+                      True).value = SOFASonix.version()
 
         # Check if creating new SOFA file or loading an existing one
         if(load is False):
@@ -142,6 +149,12 @@ class SOFASonix(object):
     def _time(self):
         return datetime.datetime.now().replace(
             microsecond=0).isoformat().replace("T", " ")
+
+    @staticmethod
+    def version():
+        return "{}.{}.{}".format(SOFASonix.API_VERSION_MAJOR,
+                                 SOFASonix.API_VERSION_MINOR,
+                                 SOFASonix.API_VERSION_PATCH)
 
     def _getData(self, query):
         try:
@@ -376,7 +389,7 @@ class SOFASonix(object):
         return flat
 
     @staticmethod
-    def load(file):
+    def load(file, verbose=True):
         gc.collect()
         raw = netCDF4.Dataset(file, "r", "NETCDF4")
         # Try to find a convention
@@ -388,7 +401,8 @@ class SOFASonix(object):
             raise SOFAError("Invalid SOFA file. No convention specified.")
 
         # Create a convention file.
-        sofa = SOFASonix(convention, version, specversion, load=True)
+        sofa = SOFASonix(convention, version, specversion, load=True,
+                         verbose=verbose)
 
         # Set dimensions if applicable
         for dim in raw.dimensions:
@@ -551,9 +565,10 @@ class SOFASonix(object):
                             for i, dim in enumerate(param.dimensions[0]):
                                 # If lowercase, define dim (assumption [0])
                                 if(dim.lower() == dim):
-                                    print(("Setting dimension '{}' from "
-                                           "parameter '{}'"
-                                           ).format(dim, param.name))
+                                    if(self.verbose):
+                                        print(("Setting dimension '{}' from "
+                                               "parameter '{}'"
+                                               ).format(dim, param.name))
                                     # Bypass any exceptions if dim is RO
                                     try:
                                         self.setDim(dim, value.shape[i],
@@ -578,7 +593,8 @@ class SOFASonix(object):
                                       "Read only.").format(key))
         # Force insertion of foreign parameter -- use for load ONLY
         elif force:
-            print("Inserting foreign parameter: '{}'".format(key))
+            if(self.verbose):
+                print("Inserting foreign parameter: '{}'".format(key))
             # Python2 fix
             try:
                 basetype = unicode
@@ -641,7 +657,8 @@ class SOFASonix(object):
                                              "removed!".format(field.name))
                     else:
                         deleteList.append([category, field.name])
-                        print("Removed '{}'".format(field.name))
+                        if(self.verbose):
+                            print("Removed '{}'".format(field.name))
                 # Remove any associated attributes if applicable
                 if(field.name.startswith("{}:".format(param))):
                     if(field.isRequired()):
@@ -649,8 +666,9 @@ class SOFASonix(object):
                               "required parameter and cannot "
                               "be automatically removed!".format(field.name))
                     else:
-                        print("Removed associated attribute '{}'"
-                              .format(field.name))
+                        if(self.verbose):
+                            print("Removed associated attribute '{}'"
+                                  .format(field.name))
                         deleteList.append([category, field.name])
         if(len(deleteList)):
             for pair in deleteList:
