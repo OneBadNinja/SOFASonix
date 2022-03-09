@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
   name="SOFASonix",
-  version="1.0.7",
+  version="1.0.8",
   author='Ioseb Laghidze',
   author_email='developer@artisan-one.com',
   description="A Lightweight Python API for the AES69-2015 Spatially Oriented Format for Acoustics (SOFA) File Format",

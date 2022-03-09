@@ -54,9 +54,9 @@ class SOFASonix(object):
     APIName = "SOFASonix"
     API_VERSION_MAJOR = 1
     API_VERSION_MINOR = 0
-    API_VERSION_PATCH = 7
+    API_VERSION_PATCH = 8
     DBFile = "ss_db.db"
-
+    
     def __init__(self, conv,
                  sofaConventionsVersion=False,
                  version=False,
@@ -65,12 +65,15 @@ class SOFASonix(object):
                  **dims):
 
         # Create DB Path
-        try:
-            cwdpath = os.path.dirname(os.path.realpath(__file__))
-        except NameError:
-            cwdpath = os.path.dirname(os.path.realpath('__file__'))
-        finally:
-            self.dbpath = "{}/{}".format(cwdpath, SOFASonix.DBFile)
+        if(os.path.isabs(SOFASonix.DBFile)):
+            self.dbpath = SOFASonix.DBFile
+        else:
+            try:
+                cwdpath = os.path.dirname(os.path.realpath(__file__))
+            except NameError:
+                cwdpath = os.path.dirname(os.path.realpath('__file__'))
+            finally:
+                self.dbpath = "{}/{}".format(cwdpath, SOFASonix.DBFile)
 
         # Set verbose
         self.verbose = True if verbose else False
@@ -157,13 +160,15 @@ class SOFASonix(object):
                                  SOFASonix.API_VERSION_PATCH)
 
     def _getData(self, query):
+        db = None
         try:
             db = sqlite3.connect(self.dbpath)
             cursor = db.cursor()
             cursor.execute(query)
             data = cursor.fetchall()
         except Exception as e:
-            db.rollback()
+            if(db is not None):
+                db.rollback()
             raise e
         finally:
             db.close()
