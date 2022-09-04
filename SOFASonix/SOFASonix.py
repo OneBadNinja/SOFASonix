@@ -48,6 +48,7 @@ import os
 import gc
 from .SOFASonixField import SOFASonixField
 from .SOFASonixError import SOFAError, SOFAFieldError
+import SOFASonixPlots
 
 
 class SOFASonix(object):
@@ -56,7 +57,7 @@ class SOFASonix(object):
     API_VERSION_MINOR = 0
     API_VERSION_PATCH = 8
     DBFile = "ss_db.db"
-    
+
     def __init__(self, conv,
                  sofaConventionsVersion=False,
                  version=False,
@@ -772,3 +773,23 @@ class SOFASonix(object):
 
         df = pd.DataFrame(rows, columns=cols)
         print(df)
+
+    def plot(self, plot_type='spectrum',
+             title='',
+             verticalRange=2,
+             horizontalRange=2,
+             noisefloor=-50,
+             ear=[0, 1],
+             azim=0,
+             elev=0,
+             unwrap=False):
+        SOFASonixPlots(self,
+                       plot_type=plot_type,
+                       title=title,
+                       verticalRange=verticalRange,
+                       horizontalRange=horizontalRange,
+                       noisefloor=noisefloor,
+                       ear=ear,
+                       azim=azim,
+                       elev=elev,
+                       unwrap=unwrap)
