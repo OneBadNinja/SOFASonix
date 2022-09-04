@@ -40,5 +40,6 @@ setuptools.setup(
           'netCDF4',
           'numpy',
           'pandas',
+          'matplotlib'
   ]
 )
